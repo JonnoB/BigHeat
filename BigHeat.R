@@ -1,12 +1,12 @@
-#Produces a an aggregated heat map
-#df = A datframe
-#merge = the number of cell in the x and y direction to merge
-#mid = The mid point of the heatmap scale, for corellation this would be 0.5
-#Requires dplyr and ggplot
 
-bigheat <-function(df,merge = 5,mid=0.5, legend="Aggregated score"){
+bigheat <-function(df,mergey = 5, mergex = 5, mid=0.5, legend="Aggregated score"){
+  #Produces a an aggregated heat map
+  #df = A dataframe
+  #merge = the number of cell in the x and y direction to merge
+  #mid = The mid point of the heatmap scale, for corellation this would be 0.5
+  #Requires dplyr and ggplot
   
-  df <- CompressDF(df, merge)
+  df <- CompressDf(df, mergey, mergex)
   
   #gather the data for the plot
   print("Reformatting into long form for ggplot")
