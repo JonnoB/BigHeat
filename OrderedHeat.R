@@ -20,7 +20,7 @@ orderedheat <-function(df, order="both", mergey = 5, mergex = 5, xblocks=10, ybl
     ordering<- createorder(df, order, simMat,xblocks, yblocks)
   }
   
-  bigheat(df[ordering$Roworder,rev(ordering$Colorder)], mergey, mergex, mid, legend)
+  bigheat(df[ordering$Roworder,ordering$Colorder], mergey, mergex, mid, legend)
   
   
 }

@@ -6,7 +6,7 @@ CompressDf <-function(df,mergey = 5, mergex = 5){
   #Requires dplyr   
   
   print("Compressing data along rows")
-  
+  df <-df[rev(1:nrow(df)),] #reverses the order so that the data is visualised correctly
   totrows <-nrow(df)
   remainder <- mergey-(totrows %%mergey)
   numgroups <-(totrows +remainder)/mergey

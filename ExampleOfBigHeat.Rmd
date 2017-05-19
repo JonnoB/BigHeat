@@ -1,0 +1,86 @@
+---
+title: "Untitled"
+author: "Jonathan Bourne"
+date: "19 May 2017"
+output: html_document
+---
+
+```{r}
+packages <-c("lubridate", "data.table", "tidyverse")
+
+new.packages <- packages[!(packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) install.packages(new.packages)
+
+sapply(packages, library, character.only = TRUE)
+rm(list=c("packages",  "new.packages"))
+```
+
+
+```{r}
+
+#Simple example
+test <- data.frame(matrix(data = 1, ncol = 20, nrow=100)) # create a dataframe of all 1's
+test[1:5, 1:5] <- NA #insert NA's at The top left corner
+orderedheat(!is.na(test),order = "none", mergex = 1, mergey = 1) #visualise
+bigheat(!is.na(test), 1,1)
+
+#Another example timeseries.
+
+#10 Id's run for 100 days from 01-01
+
+set.seed(1999)
+IDnums<- sample(1:20, replace = FALSE) #generate the ID's so that there is no structure within the blocks
+
+#Each block starts and stops at different times. This will create NA's in the data set when it is put into long form
+
+block1 <-data_frame(
+          Dates = rep(seq(dmy("01-01-2016"),(dmy("01-01-2016") + days(100-1)), by = 1), times = 10),
+          Value = rep(1:100, 10),
+          ID = rep(IDnums[1:10], each = 100)
+          )
+
+block2 <-data_frame(
+          Dates = rep(seq(dmy("01-03-2016"),(dmy("01-03-2016") + days(50-1)), by = 1), times = 5),
+          Value = rep(1:50, 5),
+          ID = rep(IDnums[11:15], each = 50)
+          )
+
+
+block3 <-data_frame(
+          Dates = rep(seq(dmy("01-02-2016"),(dmy("01-02-2016") + days(100-1)), by = 1), times = 5),
+          Value = rep(1:100, 5),
+          ID = rep(IDnums[16:20], each = 100)
+          )
+
+#Combine the data frames together and then use dcast/spread to convert it to wide form
+df <- bind_rows(block1,block2,block3) %>% 
+  dcast(., ID~Dates, 
+              value.var = "Value", 
+              drop=TRUE)
+
+#add in some additional NA values
+df[1:nrow(df),c(2:5,73:77)] <- NA
+
+#create a new data frame that shows 1 if valid data and 0 if NA
+df2 <-!is.na(df[,-1])
+
+#Visualise the data
+orderedheat(df2,order = "none")
+
+#Compression isn't necessary so change merge from default aggregating 5 cells to 1
+orderedheat(df2,order = "none", mergey = 1, mergex = 1)
+
+#See what a fully organised dataset would look like
+orderedheat(df2,order = "both", mergey = 1, mergex = 1)
+
+#In this case we want data in chronological order so we run again
+orderedheat(df2,order = "row", mergey = 1, mergex = 1)
+
+#If you want to have more than just the plot you can use the subfunction of big heat to return the order etc of the Rows and Columns
+CellOrder <- createorder(df2)
+
+#This allows us to see the groupings of the IDs, which can be useful when subsetting the data frame to find high quality zones.
+df$ID[CellOrder$Roworder]
+
+```
+
