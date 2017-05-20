@@ -13,6 +13,11 @@ if(length(new.packages)) install.packages(new.packages)
 
 sapply(packages, library, character.only = TRUE)
 rm(list=c("packages",  "new.packages"))
+
+list.files(path = "./BigHeat", pattern =".R") %>% 
+  file.path(getwd(),"BigHeat",.) %>%
+  map(source)
+
 ```
 
 
@@ -53,10 +58,14 @@ block3 <-data_frame(
           )
 
 #Combine the data frames together and then use dcast/spread to convert it to wide form
-df <- bind_rows(block1,block2,block3) %>% 
-  dcast(., ID~Dates, 
-              value.var = "Value", 
-              drop=TRUE)
+df <- bind_rows(block1,block2,block3) %>%
+  spread(., Dates, Value)
+
+#dcast is a better choice for large datasets as spread becomes very slow.
+# df <- bind_rows(block1,block2,block3) %>%
+#   dcast(., ID~Dates,
+#               value.var = "Value",
+#               drop=TRUE)
 
 #add in some additional NA values
 df[1:nrow(df),c(2:5,73:77)] <- NA
