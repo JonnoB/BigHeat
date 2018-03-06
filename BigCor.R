@@ -1,7 +1,7 @@
 #It's questionable weather there is a point to parallelising this, 
 #as if you have enough RAM you don't need bigcor
 
-bigcor <- function(x, nblocks = 10, verbose = TRUE, par = FALSE, ...)
+bigcor <- function(x, nblocks = 10, verbose = TRUE, par = NULL, ...)
 {
   library(ff, quietly = TRUE)
   NCOL <- ncol(x)
@@ -31,7 +31,7 @@ bigcor <- function(x, nblocks = 10, verbose = TRUE, par = FALSE, ...)
   ## between blocks and store them in the preallocated matrix on both
   ## symmetric sides of the diagonal
   
-  if(par){
+  if(!is.null(par)){
     mclapply(1:nrow(COMBS), function(i){
       COMB <- COMBS[i, ]
       G1 <- SPLIT[[COMB[1]]]
@@ -44,7 +44,7 @@ bigcor <- function(x, nblocks = 10, verbose = TRUE, par = FALSE, ...)
       COR <- NULL
     },
     
-    mc.cores = detectCores())
+    mc.cores = par)
   } else {
     for (i in 1:nrow(COMBS)) {
       COMB <- COMBS[i, ]
